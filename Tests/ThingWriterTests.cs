@@ -113,8 +113,6 @@ namespace Tests
         [TestMethod]
         public void Adds_One_Thing_Into_Blank_Slate()
         {
-            Assert.Inconclusive("Does not work yet, because our two services do not share a common transaction.");
-
             InTabulaRasaTransaction(writer =>
             {
                 var name = GetTimeStampedString("LONER");
@@ -122,7 +120,7 @@ namespace Tests
 
                 writer.AddThing(name, description).Value<int>();
 
-                var things = ReaderService.GetAllThings();
+                var things = ReaderServiceFrom(writer).GetAllThings();
 
                 Assert.AreEqual(1, things.Count());
             });

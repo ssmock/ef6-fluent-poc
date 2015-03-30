@@ -6,21 +6,14 @@ using System.Threading.Tasks;
 
 namespace EfTransactions
 {
-    public class ThingReader
+    public class ThingReader: ThingAccess
     {
-        ThingEntities _store;
-
-        private ThingEntities Store
+        public static ThingReader WithSharedStore(ThingAccess other)
         {
-            get
-            {
-                if (_store == null)
-                {
-                    _store = new ThingEntities();
-                }
+            ThingReader result = new ThingReader();
+            result.SetStore(other.Store);
 
-                return _store;
-            }
+            return result;
         }
 
         public IEnumerable<Thing> GetAllThings()

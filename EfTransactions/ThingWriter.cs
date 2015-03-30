@@ -7,32 +7,13 @@ using System.Threading.Tasks;
 
 namespace EfTransactions
 {
-    public class ThingWriter : IDisposable
+    public class ThingWriter : ThingAccess, IDisposable
     {
-        ThingEntities _store;
-        DbContextTransaction _transaction;
         object _value;
 
-        private ThingEntities Store
-        {
-            get
-            {
-                if (_store == null)
-                {
-                    _store = new ThingEntities();
-                }
+        //public ThingWriter() { /* Nothing */ }
 
-                return _store;
-            }
-        }
-
-        public bool HasOpenTransaction
-        {
-            get
-            {
-                return _transaction != null;
-            }
-        }
+        //public ThingWriter(ThingEntities store) : base(store) { /* Nothing */ }
 
         public ThingWriter AddThing(string name, string description)
         {
@@ -53,7 +34,7 @@ namespace EfTransactions
 
         public void ClearAllThings()
         {
-            foreach(var thing in Store.Things)
+            foreach (var thing in Store.Things)
             {
                 Store.Entry(thing).State = EntityState.Deleted;
             }
@@ -63,10 +44,7 @@ namespace EfTransactions
 
         public ThingWriter InTransaction()
         {
-            if (_transaction == null)
-            {
-                _transaction = Store.Database.BeginTransaction();
-            }
+            if (!HasOpenTransaction) BeginTransaction();
 
             return this;
         }
@@ -83,29 +61,16 @@ namespace EfTransactions
             return this;
         }
 
-        public void Dispose()
+        public new ThingWriter Rollback()
         {
-            if (HasOpenTransaction) _transaction.Dispose();
-        }
-
-        public ThingWriter Rollback()
-        {
-            if (HasOpenTransaction)
-            {
-                _transaction.Rollback();
-                _transaction = null;
-            }
+            base.Rollback();
 
             return this;
         }
 
-        public ThingWriter Commit()
+        public new ThingWriter Commit()
         {
-            if (HasOpenTransaction)
-            {
-                _transaction.Commit();
-                _transaction = null;
-            }
+            base.Commit();
 
             return this;
         }

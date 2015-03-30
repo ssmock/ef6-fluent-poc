@@ -41,6 +41,11 @@ namespace Tests
             }
         }
 
+        protected ThingReader ReaderServiceFrom(ThingWriter writer)
+        {
+            return ThingReader.WithSharedStore(WriterService);
+        }
+
         protected string GetTransientName()
         {
             return GetTimeStampedString(TRANSIENT_THING_NAME);
